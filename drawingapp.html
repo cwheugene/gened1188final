@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>drawing.app</title>
+</head>
+<body>
+  <div style="text-align:center; margin-bottom:10px;">
+    <label>Color: <input type="color" id="colorPicker" value="#000000"></label>
+    <label>Pen Width: <input type="range" id="penWidth" min="1" max="20" value="5"></label>
+    <button onclick="eraserMode()">Eraser</button>
+    <button onclick="clearCanvas()">Clear</button>
+  </div>
+  <canvas id="drawCanvas" width="800" height="500" style="border:1px solid #ccc; display:block; margin:auto;"></canvas>
+
+  <script>
+    const canvas = document.getElementById('drawCanvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+    let color = document.getElementById('colorPicker').value;
+    let lineWidth = document.getElementById('penWidth').value;
+    let erasing = false;
+
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mouseout', stopDrawing);
+
+    document.getElementById('colorPicker').addEventListener('input', function() {
+      color = this.value;
+      erasing = false;
+    });
+
+    document.getElementById('penWidth').addEventListener('input', function() {
+      lineWidth = this.value;
+    });
+
+    function startDrawing(e) {
+      drawing = true;
+      draw(e);
+    }
+
+    function draw(e) {
+      if (!drawing) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      ctx.lineWidth = lineWidth;
+      ctx.lineCap = "round";
+      ctx.strokeStyle = erasing ? "white" : color;
+
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+    }
+
+    function stopDrawing() {
+      drawing = false;
+      ctx.beginPath();
+    }
+
+    function eraserMode() {
+      erasing = true;
+    }
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+  </script>
+</body>
+</html>
